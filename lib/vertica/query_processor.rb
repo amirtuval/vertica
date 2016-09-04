@@ -65,7 +65,6 @@ module Vertica::QueryProcessor
 
   def complete_operation(tag)
     self.result = Vertica::Result.new(row_description: row_description, rows: buffer, tag: tag)
-    self.row_description = nil
     self.buffer = nil
   end
 end

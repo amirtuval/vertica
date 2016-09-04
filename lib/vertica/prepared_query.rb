@@ -62,11 +62,17 @@ class Vertica::PreparedQuery
   #     the provided query cannot be evaluated.
   #
   def execute(*parameter_values, &block)
-    @connection.send(:run_in_mutex, 
-      Vertica::PreparedQueryExecutor.new(@connection, @sql, @name, @row_description, @parameter_types, parameter_values, block)
-    )
+    portal = bind(*parameter_values)
+    result = portal.execute(&block)
+    portal.close
+
+    result
   end
   
+  def bind(*parameter_values)
+    Vertica::PreparedQueryExecutor.new(@connection, @sql, @name, @row_description, @parameter_types, parameter_values)
+  end
+
   private
 
   def process_message(message)

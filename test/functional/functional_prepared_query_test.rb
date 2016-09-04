@@ -154,7 +154,7 @@ class FunctionalPreparedQueryTest < Minitest::Test
       .execute(124, 'hello world', 'hello', 'hello world', today, now, now, true, -1.123, decimal, binary_data)
 
     pq = @connection.prepare("select * from pq_conversions_table where int_field = ?")
-    
+
     assert_equal 1, pq.execute(124).size  
     assert_equal 0, pq.execute(125).size  
 
@@ -213,6 +213,20 @@ class FunctionalPreparedQueryTest < Minitest::Test
 
     assert_equal 1, pq.execute(binary_data).size  
     assert_equal 0, pq.execute(binary_data + '3').size  
+  end
+
+  def test_portal
+    portal = @connection.prepare('select ?::int').bind(5)
+
+    r = portal.execute
+
+    assert_equal 1, r.size
+    assert_equal 5, r[0][0]
+
+    r = portal.execute
+
+    assert_equal 1, r.size
+    assert_equal 5, r[0][0]
   end
 
   def test_raise_when_connection_is_in_use
